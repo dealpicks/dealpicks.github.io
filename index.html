@@ -64,6 +64,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .hero h1{margin-top:16px;font-size:26px;line-height:1.38;font-weight:700;letter-spacing:-0.03em}
 .hero h1 em{font-style:normal;color:var(--blue)}
 .hero p{margin-top:10px;font-size:16px;line-height:1.55;color:var(--g600)}
+.hero .by{margin-top:12px;font-size:13px;line-height:1.6;color:var(--g500)}
+.hero .by a{color:var(--blue);font-weight:600;text-decoration:none}
+.stale{margin:0 20px 16px;padding:12px 14px;border-radius:12px;background:var(--red-weak);color:var(--red);font-size:13.5px;line-height:1.5;font-weight:600}
+.stale[hidden]{display:none}
 
 /* stats */
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 20px 8px}
@@ -168,7 +172,9 @@ footer{padding:24px 24px 8px;font-size:12px;color:var(--g400);line-height:1.6}
     <span class="date">10월 28일 기준</span>
     <h1>오늘 가장 많이 내린<br><em>특가 <span id="heroN">50</span>개</em>, 후딱 체크하세요</h1>
     <p>쿠팡 골드박스 전체에서 할인율 큰 순서로 딱 50개만 골랐어요. 1분이면 다 봐요.</p>
+    <p class="by">고르는 기준: 쿠팡 골드박스 상품만 · 할인율 높은 순 · 주류·성인용품·의약품 제외<br>현직 커머스 가격 담당자가 운영해요 · <a href="https://www.threads.com/@taste_trip_diary" target="_blank" rel="noopener" id="threadsLink">스레드 @taste_trip_diary</a></p>
   </section>
+  <div class="stale" id="stale" role="status" hidden></div>
 
   <div class="disclosure" role="note">
     <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 10.5h-1.5V7h1.5v4.5zM8 5.75a.9.9 0 1 1 0-1.8.9.9 0 0 1 0 1.8z"/></svg>
@@ -236,6 +242,9 @@ const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'
 const items = DATA.map(d => ({...d, rate: Math.round((1 - d.sale / d.orig) * 100), url: "https://link.coupang.com/a/" + d.code}));
 const img = (d, size) => `<img src="${CDN}${size}/${d.img}" alt="${esc(d.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer">`;
 const linkAttrs = d => `href="${d.url}" target="_blank" rel="sponsored nofollow noopener" data-id="${d.id}"`;
+
+// 오래된 목록 안내: 기준일이 오늘(KST)이 아니면 표시
+(() => { const m = (document.querySelector(".hero .date")||{}).textContent?.match(/(\d{1,2})월 (\d{1,2})일/); if (!m) return; const k = new Date(Date.now() + 9*3600e3); if (+m[1] === k.getUTCMonth()+1 && +m[2] === k.getUTCDate()) return; const s = document.getElementById("stale"); s.textContent = `오늘 목록은 아직 업데이트 전이에요. 아래는 ${m[1]}월 ${m[2]}일 기준이라 이미 끝난 특가가 있을 수 있어요.`; s.hidden = false; })();
 
 // stats
 const rates = items.map(d => d.rate);
