@@ -1,8 +1,8 @@
-# 딜픽 (dealpick)
+# 딜픽 (dealpicks)
 
 쿠팡 골드박스에서 할인율이 큰 상품 30개를 골라 모아둔 모바일 특가 페이지입니다.
 
-- 페이지: https://michaelcho-haman.github.io/dealpick/
+- 페이지: https://dealpicks.github.io
 - 모든 상품 링크는 쿠팡 파트너스 링크입니다.
 
 > 이 페이지는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
