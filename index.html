@@ -62,6 +62,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .date{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--blue);background:var(--blue-weak);padding:6px 10px;border-radius:8px}
 .date::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--blue);animation:pulse 1.6s infinite}
 @keyframes pulse{50%{opacity:.25}}
+.timer{display:inline-flex;align-items:center;margin-left:6px;font-size:14px;font-weight:700;color:var(--red);background:var(--red-weak);padding:6px 10px;border-radius:8px;font-variant-numeric:tabular-nums}
+.timer[hidden]{display:none}
 .hero h1{margin-top:16px;font-size:26px;line-height:1.38;font-weight:700;letter-spacing:-0.03em}
 .hero h1 em{font-style:normal;color:var(--blue)}
 .hero p{margin-top:10px;font-size:16px;line-height:1.55;color:var(--g600)}
@@ -114,20 +116,24 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .sort button[aria-pressed="true"]{background:var(--bg);color:var(--g900);box-shadow:0 1px 3px rgba(0,0,0,.08)}
 
 /* list */
-.list{list-style:none;padding:4px 0 8px}
-.row{display:flex;gap:16px;align-items:center;padding:14px 24px;position:relative}
-.row:active{background:var(--g50)}
-.row .thumb{flex:0 0 88px;height:88px;border-radius:16px;background:#fff;overflow:hidden;position:relative;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}
+.list{list-style:none;padding:8px 12px 8px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 10px}
+.list>li.empty{grid-column:1/-1}
+.row{display:flex;flex-direction:column;position:relative;min-width:0}
+.row .thumb{aspect-ratio:1/1;border-radius:14px;background:#fff;overflow:hidden;position:relative;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);transition:transform .15s}
+.row:active .thumb{transform:scale(.97)}
 .row .thumb img{width:100%;height:100%;object-fit:contain}
-.row .info{flex:1;min-width:0}
-.row .cat{font-size:12px;font-weight:600;color:var(--g500)}
-.row .name{font-size:15px;line-height:1.45;color:var(--g800);margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.row .price-row{margin-top:4px}
-.row .rate{font-size:17px}
-.row .price{font-size:17px;font-weight:700}
-.row .orig{margin-top:0;font-size:12px}
-.row .go{flex:0 0 auto;color:var(--g300)}
-.save{display:inline-block;margin-top:6px;font-size:12px;font-weight:600;color:var(--blue);background:var(--blue-weak);padding:3px 7px;border-radius:6px}
+.row .badge{position:absolute;left:8px;top:8px;height:24px;padding:0 8px;border-radius:7px;background:var(--red);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;letter-spacing:-0.02em}
+.row .info{padding:10px 4px 0;min-width:0}
+.row .cat{font-size:11.5px;font-weight:600;color:var(--g500)}
+.row .name{font-size:14px;line-height:1.4;color:var(--g800);margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:39px}
+.row .orig{margin-top:6px;font-size:12px}
+.row .price-row{margin-top:1px;flex-wrap:wrap;row-gap:2px}
+.row .rate{font-size:17px;font-weight:800}
+.row .price{font-size:17px;font-weight:800}
+.row .go{display:none}
+.save{display:inline-block;margin-top:6px;font-size:11.5px;font-weight:600;color:var(--blue);background:var(--blue-weak);padding:3px 7px;border-radius:6px}
+.row .buy{margin-top:10px;height:36px;border-radius:10px;background:var(--g100);color:var(--g800);font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.row:active .buy{background:var(--blue);color:#fff}
 .wow{display:inline-block;margin-left:6px;vertical-align:2px;font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-weak);padding:2px 5px;border-radius:5px}
 .more{display:block;width:calc(100% - 48px);margin:4px 24px 8px;height:52px;border-radius:14px;background:var(--g100);color:var(--g800);font-size:15px;font-weight:600}
 .more:active{transform:scale(.98)}
@@ -170,7 +176,7 @@ footer{padding:24px 24px 8px;font-size:12px;color:var(--g400);line-height:1.6}
   </header>
 
   <section class="hero">
-    <span class="date">10월 31일 기준</span>
+    <span class="date">10월 31일 기준</span><span class="timer" id="timer" hidden></span>
     <h1>오늘 가장 많이 내린<br><em>특가 <span id="heroN">50</span>개</em>, 후딱 체크하세요</h1>
     <p>쿠팡 골드박스 전체에서 할인율 큰 순서로 딱 50개만 골랐어요. 1분이면 다 봐요.</p>
     <p class="by">고르는 기준: 쿠팡 골드박스 상품만 · 할인율 높은 순 · 주류·성인용품·의약품 제외<br>현직 커머스 가격 담당자가 운영해요 · <a href="https://www.threads.com/@taste_trip_diary" target="_blank" rel="noopener" id="threadsLink">스레드 @taste_trip_diary</a></p>
@@ -247,6 +253,21 @@ const linkAttrs = d => `href="${d.url}" target="_blank" rel="sponsored nofollow 
 // 오래된 목록 안내: 기준일이 오늘(KST)이 아니면 표시
 (() => { const m = (document.querySelector(".hero .date")||{}).textContent?.match(/(\d{1,2})월 (\d{1,2})일/); if (!m) return; const k = new Date(Date.now() + 9*3600e3); if (+m[1] === k.getUTCMonth()+1 && +m[2] === k.getUTCDate()) return; const s = document.getElementById("stale"); s.textContent = `오늘 목록은 아직 업데이트 전이에요. 아래는 ${m[1]}월 ${m[2]}일 기준이라 이미 끝난 특가가 있을 수 있어요.`; s.hidden = false; })();
 
+// 자정(KST) 마감 카운트다운 — 기준일이 오늘일 때만 표시
+(() => {
+  const t = document.getElementById("timer");
+  const m = (document.querySelector(".hero .date")||{}).textContent?.match(/(\d{1,2})월 (\d{1,2})일/);
+  const p = n => String(n).padStart(2, "0");
+  const tick = () => {
+    const k = new Date(Date.now() + 9*3600e3);
+    if (!m || +m[1] !== k.getUTCMonth()+1 || +m[2] !== k.getUTCDate()) { t.hidden = true; return; }
+    const left = Math.max(0, 86400 - (k.getUTCHours()*3600 + k.getUTCMinutes()*60 + k.getUTCSeconds()));
+    t.textContent = `마감 ${p(Math.floor(left/3600))}:${p(Math.floor(left%3600/60))}:${p(left%60)}`;
+    t.hidden = false;
+  };
+  tick(); setInterval(tick, 1000);
+})();
+
 // stats
 const rates = items.map(d => d.rate);
 document.getElementById("maxRate").textContent = Math.max(...rates) + "%";
@@ -283,15 +304,15 @@ function render(){
   list = list.slice(0, state.limit);
   document.getElementById("list").innerHTML = list.length ? list.map(d => `
     <li><a class="row" ${linkAttrs(d)}>
-      <div class="thumb">${img(d,"230x230ex")}</div>
+      <div class="thumb">${img(d,"492x492ex")}<span class="badge">${d.rate}%</span></div>
       <div class="info">
         <div class="cat">${d.cat}</div>
         <div class="name">${esc(d.name)}</div>
-        <div class="price-row"><span class="rate">${d.rate}%</span><span class="price">${won(d.sale)}</span>${d.pt==="wow"?'<span class="wow">와우가</span>':""}</div>
         <div class="orig">${won(d.orig)}</div>
+        <div class="price-row"><span class="rate">${d.rate}%</span><span class="price">${won(d.sale)}</span>${d.pt==="wow"?'<span class="wow">와우가</span>':""}</div>
         <span class="save">${won(d.orig - d.sale)} 아껴요</span>
+        <div class="buy">쿠팡에서 보기</div>
       </div>
-      <svg class="go" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
     </a></li>`).join("") : `<li class="empty">이 카테고리엔 특가가 없어요</li>`;
 }
 chips.addEventListener("click", e => {
